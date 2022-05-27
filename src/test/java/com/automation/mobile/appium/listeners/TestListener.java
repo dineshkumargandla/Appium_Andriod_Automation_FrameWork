@@ -3,9 +3,11 @@ package com.automation.mobile.appium.listeners;
 import com.automation.mobile.appium.reporting.ExtentReport;
 import com.automation.mobile.appium.utils.ConfigurationPropertyReader;
 import com.automation.mobile.appium.utils.DateAndTimeUtils;
+import com.automation.mobile.appium.utils.Logs;
 import com.automation.mobile.appium.utils.utility;
 import com.aventstack.extentreports.MediaEntityBuilder;
 import com.aventstack.extentreports.Status;
+import lombok.extern.java.Log;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
@@ -24,22 +26,25 @@ import java.util.Map;
 import java.util.Properties;
 
 import static com.automation.mobile.appium.setup.DriverManager.driver;
+import static com.automation.mobile.appium.utils.ConfigurationPropertyReader.getScreenOutDir;
 
 public class TestListener implements ITestListener {
 
     public void onTestFailure(ITestResult result) {
-        attachScreenShotToExtentReport(result);
+        if(ConfigurationPropertyReader.getTakeShootsOnFailure().equalsIgnoreCase("true")) {
+            attachScreenShotToExtentReport(result);
+        }
     }
 
 
     private void attachScreenShotToExtentReport(ITestResult result) {
         String propertyPath = System.getProperty("user.dir") + "//src//main//resources//android.properties";
         Properties properties = utility.loadProperties(propertyPath);
-        if(result.getThrowable() != null) {
+        if (result.getThrowable() != null) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             result.getThrowable().printStackTrace(pw);
-            //utils.log().error(sw.toString());
+            Logs.error(sw.toString());
         }
 
         File file = driver.getScreenshotAs(OutputType.FILE);
@@ -52,11 +57,8 @@ public class TestListener implements ITestListener {
             e1.printStackTrace();
         }
 
-        Map <String, String> params = new HashMap<String, String>();
-        params = result.getTestContext().getCurrentXmlTest().getAllParameters();
-
-        String imagePath = "Screenshots" +File.separator+ ConfigurationPropertyReader.getProductVersion()+"."+ConfigurationPropertyReader.getProductBuild()+ File.separator + properties.getProperty("platformName")
-                + "_" +properties.getProperty("deviceName") + File.separator + DateAndTimeUtils.getDate() +File.separator + DateAndTimeUtils.getCurrentTime() + File.separator
+        String imagePath = getScreenOutDir() + File.separator + "Screenshots" + File.separator + ConfigurationPropertyReader.getProductVersion() + "." + ConfigurationPropertyReader.getProductBuild() + File.separator + properties.getProperty("platformName")
+                + "_" + properties.getProperty("deviceName") + File.separator + DateAndTimeUtils.getDate() + File.separator + DateAndTimeUtils.getCurrentTimeModified() + File.separator
                 + result.getTestClass().getRealClass().getSimpleName() + File.separator + result.getName() + ".png";
 
         String completeImagePath = System.getProperty("user.dir") + File.separator + imagePath;
@@ -64,7 +66,7 @@ public class TestListener implements ITestListener {
         try {
             FileUtils.copyFile(file, new File(imagePath));
             Reporter.log("This is the sample screenshot");
-            Reporter.log("<a href='"+ completeImagePath + "'> <img src='"+ completeImagePath + "' height='400' width='400'/> </a>");
+            Reporter.log("<a href='" + completeImagePath + "'> <img src='" + completeImagePath + "' height='400' width='400'/> </a>");
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -104,7 +106,6 @@ public class TestListener implements ITestListener {
     @Override
     public void onStart(ITestContext context) {
         // TODO Auto-generated method stub
-
     }
 
     @Override

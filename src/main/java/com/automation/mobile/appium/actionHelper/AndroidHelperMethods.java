@@ -14,7 +14,7 @@ public class AndroidHelperMethods {
 
     public static void click(MobileElement element) {
         element.click();
-        Logs.info(element + "Element is getting clicked");
+        Logs.info(element  + " Element is getting clicked");
     }
     public void inputValuesSlowly(MobileElement element, String value) {
         try {
@@ -27,8 +27,8 @@ public class AndroidHelperMethods {
                 Thread.sleep(100);
             }
         } catch (Exception e) {
-            Logs.error();
-            System.out.println("Not able to enter" + e.getMessage());
+            Logs.error("Not able to enter " + e.getMessage());
+            System.out.println("Not able to enter " + e.getMessage());
         }
     }
 
@@ -38,12 +38,14 @@ public class AndroidHelperMethods {
 
     public static void sendKeys(MobileElement element, String input) {
         element.sendKeys(input);
-        System.out.println("Sending " + input + " to element " +element);
+        Logs.info("Sending '" + input + "' to element " +element);
+        System.out.println("Sending '" + input + "' to element " +element);
     }
 
     public static String getText(MobileElement e) throws InterruptedException {
-
+        Logs.info("Waiting for 5 Secs");
         Waits.sleep(5000);
+        Logs.info("Extracting text from Element " +e);
         return e.getText();
     }
 }

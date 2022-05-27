@@ -71,7 +71,4 @@ public class CredentialsConstants {
     public static void setPerformanceGlitchUser(String performanceGlitchUser) {
         PERFORMANCE_GLITCH_USER = performanceGlitchUser;
     }
-
-
-
 }
